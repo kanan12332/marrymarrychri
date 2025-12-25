@@ -10,6 +10,14 @@
             margin: 0;
             padding: 0;
             box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+            -webkit-touch-callout: none;
+        }
+        
+        html, body {
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
         }
         
         body {
@@ -18,6 +26,13 @@
             height: 100vh;
             overflow: hidden;
             background: linear-gradient(to bottom, #0a2e1d 0%, #0d3b29 100%);
+            touch-action: manipulation;
+            -webkit-font-smoothing: antialiased;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
         }
         
         /* 背景图片容器 */
@@ -27,7 +42,7 @@
             left: 0;
             width: 100%;
             height: 100%;
-            z-index: -1;
+            z-index: 1;
             opacity: 0.8;
         }
         
@@ -35,6 +50,7 @@
             width: 100%;
             height: 100%;
             object-fit: cover;
+            display: block;
         }
         
         /* 第一阶段：礼盒屏幕 */
@@ -49,6 +65,7 @@
             justify-content: center;
             align-items: center;
             background: rgba(10, 31, 20, 0.3);
+            z-index: 3;
         }
         
         /* 礼盒容器 */
@@ -61,6 +78,8 @@
             display: flex;
             flex-direction: column;
             align-items: center;
+            -webkit-user-select: none;
+            user-select: none;
         }
         
         /* 礼盒图片 */
@@ -70,6 +89,8 @@
             object-fit: contain;
             filter: drop-shadow(0 10px 20px rgba(0, 0, 0, 0.5));
             animation: pulse 2s infinite ease-in-out;
+            -webkit-user-drag: none;
+            user-drag: none;
         }
         
         @keyframes pulse {
@@ -111,6 +132,8 @@
             display: flex;
             align-items: center;
             justify-content: center;
+            -webkit-user-select: none;
+            user-select: none;
         }
         
         @keyframes arrowBounce {
@@ -136,6 +159,8 @@
             backdrop-filter: blur(5px);
             margin-top: 10px;
             max-width: 90%;
+            -webkit-user-select: none;
+            user-select: none;
         }
         
         /* 爆炸粒子容器 */
@@ -178,9 +203,12 @@
             font-size: 24px;
             pointer-events: none;
             animation: explode 1s ease-out forwards;
+            -webkit-user-select: none;
+            user-select: none;
         }
         
         /* ============== 雪花效果 ============== */
+        /* 修复：雪花容器置顶，允许遮挡字幕 */
         .snow-container {
             position: fixed;
             top: 0;
@@ -188,15 +216,22 @@
             width: 100%;
             height: 100%;
             pointer-events: none;
-            z-index: 1;
+            z-index: 100; /* 提高层级，确保在最前面 */
+            overflow: hidden;
         }
         
         .snowflake {
             position: absolute;
-            top: -50px;
+            top: -60px;
             pointer-events: none;
             will-change: transform, top;
             animation: snowFall linear infinite;
+            -webkit-user-select: none;
+            user-select: none;
+            background-size: contain;
+            background-repeat: no-repeat;
+            background-position: center;
+            background-image: none !important;
         }
         
         @keyframes snowFall {
@@ -208,24 +243,12 @@
                 opacity: 1;
             }
             100% {
-                transform: translateX(var(--snow-x)) translateY(100vh) rotate(360deg);
+                transform: translateX(var(--snow-x, 0)) translateY(100vh) rotate(360deg);
                 opacity: 0;
             }
         }
         
-        /* 雪花拖尾粒子 - 修复：拖尾在雪花后面 */
-        .snow-trail {
-            position: absolute;
-            width: 6px;
-            height: 6px;
-            border-radius: 50%;
-            background-color: rgba(255, 255, 255, 0.6);
-            pointer-events: none;
-            opacity: 0;
-            filter: blur(1px);
-        }
-        
-        /* ============== 9秒硬控动画 ============== */
+        /* ============== 10秒硬控动画 ============== */
         .hard-control-overlay {
             position: fixed;
             top: 0;
@@ -251,11 +274,13 @@
             top: 30%;
             left: 50%;
             transform: translateX(-50%);
+            -webkit-user-select: none;
+            user-select: none;
         }
         
         .santa-flying-center.visible {
             opacity: 1;
-            animation: santaFlyToCenter 9s ease-in-out forwards;
+            animation: santaFlyToCenter 10s ease-in-out forwards;
         }
         
         @keyframes santaFlyToCenter {
@@ -312,6 +337,8 @@
             opacity: 0;
             pointer-events: none;
             animation: dropGift 3s ease-out forwards;
+            -webkit-user-select: none;
+            user-select: none;
         }
         
         @keyframes dropGift {
@@ -339,7 +366,7 @@
         }
         
         /* ============== 圣诞老人动图 ============== */
-        .santa-video {
+        .santa-image {
             position: absolute;
             width: 180px;
             height: auto;
@@ -348,6 +375,9 @@
             opacity: 0;
             pointer-events: none;
             top: 15%;
+            -webkit-user-select: none;
+            user-select: none;
+            display: block !important;
         }
         
         /* 礼盒阶段的圣诞老人（从左到右） */
@@ -367,7 +397,7 @@
             transform: scaleX(-1); /* 镜像翻转，面朝左边 */
         }
         
-        .santa-video.visible {
+        .santa-image.visible {
             opacity: 1;
             animation: santaFly 25s linear infinite;
         }
@@ -460,11 +490,34 @@
             filter: drop-shadow(0 8px 20px rgba(0, 0, 0, 0.6));
             cursor: pointer;
             transition: all 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+            -webkit-user-select: none;
+            user-select: none;
+            display: block !important;
         }
         
         .tree-image:hover {
             transform: scale(1.08) rotate(3deg);
             filter: drop-shadow(0 12px 25px rgba(0, 0, 0, 0.7));
+        }
+        
+        /* 新增：圣诞树跳舞动画 - 左右摇摆 */
+        .tree-image.dancing {
+            animation: treeDance 3s ease-in-out infinite;
+        }
+        
+        @keyframes treeDance {
+            0%, 100% { 
+                transform: rotate(0deg) translateX(0); 
+            }
+            25% { 
+                transform: rotate(-5deg) translateX(-8px); 
+            }
+            50% { 
+                transform: rotate(0deg) translateX(0); 
+            }
+            75% { 
+                transform: rotate(5deg) translateX(8px); 
+            }
         }
         
         .tree-title {
@@ -478,6 +531,8 @@
             padding: 8px 20px;
             border-radius: 15px;
             border: 2px solid #FFD700;
+            -webkit-user-select: none;
+            user-select: none;
         }
         
         /* 圣诞树装饰品 - 修复位置 */
@@ -497,6 +552,8 @@
             color: white;
             font-weight: bold;
             text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
+            -webkit-user-select: none;
+            user-select: none;
         }
         
         .ornament:hover {
@@ -562,48 +619,94 @@
             height: 100%;
             display: none;
             flex-direction: column;
-            justify-content: center;
             align-items: center;
+            justify-content: center;
             background: rgba(10, 31, 20, 0.8);
             backdrop-filter: blur(3px);
+            z-index: 2;
+            padding: 20px;
+            box-sizing: border-box;
+            overflow-y: auto;
+            -webkit-overflow-scrolling: touch;
         }
         
-        /* 祝福语区域 */
+        /* 祝福语区域 - 修复文字对齐问题 */
         .blessing-container {
-            background: rgba(196, 30, 58, 0.15);
+            background: rgba(196, 30, 58, 0.25);
             border-radius: 20px;
-            padding: 25px;
+            padding: 30px;
             margin: 20px;
-            max-width: 600px;
+            max-width: 700px;
+            width: 90%;
             border: 2px solid #FFD700;
             backdrop-filter: blur(10px);
             z-index: 5;
-            min-height: 200px;
+            min-height: 250px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
         }
         
         .blessing-title {
             font-size: 28px;
             color: #FFD700;
-            margin-bottom: 15px;
+            margin-bottom: 25px;
             text-align: center;
+            text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.7);
+            font-weight: bold;
+            padding-bottom: 15px;
+            border-bottom: 2px solid rgba(255, 215, 0, 0.3);
+            width: 100%;
         }
         
+        /* 修复：文字对齐工整，避免流体输出混乱 */
         .blessing-text {
-            font-size: 20px;
-            line-height: 1.6;
+            font-size: 22px;
+            line-height: 1.8;
             color: white;
             text-align: center;
-            min-height: 150px;
+            min-height: 180px;
+            width: 100%;
+            font-family: "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", "SimHei", sans-serif;
+            text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.5);
+            padding: 0 10px;
+            box-sizing: border-box;
+            word-break: keep-all;
+            white-space: normal;
+            overflow-wrap: break-word;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        
+        /* 每行祝福语容器 */
+        .blessing-line {
+            margin-bottom: 15px;
+            width: 100%;
+            text-align: center;
+            animation: fadeInUp 0.5s ease-out forwards;
+            opacity: 0;
+            transform: translateY(10px);
+        }
+        
+        @keyframes fadeInUp {
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
         }
         
         .typing-cursor {
             display: inline-block;
             width: 3px;
-            height: 24px;
+            height: 28px;
             background-color: #FFD700;
             animation: blink 1s infinite;
             vertical-align: middle;
-            margin-left: 2px;
+            margin-left: 5px;
         }
         
         @keyframes blink {
@@ -621,115 +724,282 @@
             animation: treeGlow 2s infinite;
         }
         
-        /* 响应式调整 */
+        /* 手动播放按钮样式 */
+        #manual-play-btn {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 2000; /* 确保在雪花之上 */
+            padding: 12px 24px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 30px;
+            font-size: 16px;
+            font-weight: bold;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+            cursor: pointer;
+            display: none;
+        }
+        #manual-play-btn.error {
+            background: #ff6b6b;
+        }
+        
+        /* 加载指示器 */
+        .loading-indicator {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 2001;
+            background: rgba(0, 0, 0, 0.8);
+            padding: 15px 25px;
+            border-radius: 10px;
+            color: #FFD700;
+            font-size: 16px;
+            display: none;
+            text-align: center;
+        }
+        
+        /* 响应式调整 - 手机端优化 */
         @media screen and (max-width: 768px) {
             .gift-container {
-                width: 150px;
-                height: 210px;
+                width: 180px;
+                height: 230px;
             }
             
             .gift-image {
-                width: 150px;
-                height: 150px;
+                width: 180px;
+                height: 180px;
             }
             
             .click-arrow {
-                font-size: 40px;
+                font-size: 45px;
                 margin-bottom: 10px;
-                height: 50px;
+                height: 55px;
             }
             
             .instruction {
-                font-size: 18px;
-                padding: 12px 25px;
+                font-size: 20px;
+                padding: 14px 28px;
+                margin: 0 15px;
             }
             
-            .santa-video {
-                width: 140px;
-            }
-            
-            #santa-opening {
-                width: 120px;
+            .santa-image {
+                width: 160px;
+                top: 10%;
             }
             
             .santa-flying-center {
-                width: 160px;
+                width: 180px;
+                top: 25%;
             }
             
             .tree-container {
-                width: 200px;
-                height: 300px;
+                width: 240px;
+                height: 360px;
                 left: 3%;
+                bottom: 8%;
+            }
+            
+            .tree-title {
+                font-size: 22px;
+                padding: 6px 16px;
+                margin-top: 10px;
+            }
+            
+            .ornament {
+                width: 32px;
+                height: 32px;
+                font-size: 16px;
             }
             
             .blessing-container {
                 margin: 15px;
-                padding: 20px;
+                padding: 25px;
+                max-width: 90%;
             }
             
             .blessing-title {
-                font-size: 24px;
+                font-size: 26px;
+                margin-bottom: 20px;
             }
             
             .blessing-text {
-                font-size: 18px;
+                font-size: 20px;
+                line-height: 1.7;
+                min-height: 160px;
+            }
+            
+            .dropped-gift {
+                font-size: 35px;
+            }
+            
+            #manual-play-btn {
+                padding: 10px 20px;
+                font-size: 14px;
+                bottom: 15px;
             }
         }
         
         @media screen and (max-width: 480px) {
             .gift-container {
-                width: 130px;
-                height: 190px;
+                width: 160px;
+                height: 210px;
             }
             
             .gift-image {
-                width: 130px;
-                height: 130px;
+                width: 160px;
+                height: 160px;
+            }
+            
+            .click-arrow {
+                font-size: 40px;
+                margin-bottom: 8px;
+                height: 50px;
+            }
+            
+            .instruction {
+                font-size: 18px;
+                padding: 12px 24px;
+                margin: 0 10px;
+            }
+            
+            .santa-image {
+                width: 140px;
+                top: 8%;
+            }
+            
+            .santa-flying-center {
+                width: 150px;
+                top: 20%;
+            }
+            
+            .tree-container {
+                width: 200px;
+                height: 300px;
+                left: 2%;
+                bottom: 6%;
+            }
+            
+            .tree-title {
+                font-size: 20px;
+                padding: 5px 14px;
+                margin-top: 8px;
+            }
+            
+            .ornament {
+                width: 28px;
+                height: 28px;
+                font-size: 14px;
+            }
+            
+            .blessing-container {
+                margin: 10px;
+                padding: 20px;
+            }
+            
+            .blessing-title {
+                font-size: 24px;
+                margin-bottom: 15px;
+            }
+            
+            .blessing-text {
+                font-size: 18px;
+                line-height: 1.6;
+                min-height: 140px;
+            }
+            
+            .dropped-gift {
+                font-size: 30px;
+            }
+            
+            #manual-play-btn {
+                padding: 10px 18px;
+                font-size: 14px;
+            }
+        }
+        
+        @media screen and (orientation: landscape) and (max-height: 600px) {
+            .gift-container {
+                width: 140px;
+                height: 180px;
+                margin-bottom: 15px;
+            }
+            
+            .gift-image {
+                width: 140px;
+                height: 140px;
             }
             
             .click-arrow {
                 font-size: 35px;
-                margin-bottom: 8px;
-                height: 45px;
+                margin-bottom: 5px;
+                height: 40px;
             }
             
             .instruction {
-                font-size: 16px;
+                font-size: 18px;
                 padding: 10px 20px;
-            }
-            
-            .santa-video {
-                width: 100px;
-            }
-            
-            #santa-opening {
-                width: 100px;
-            }
-            
-            .santa-flying-center {
-                width: 120px;
+                margin-top: 5px;
             }
             
             .tree-container {
-                width: 160px;
-                height: 240px;
-                left: 2%;
+                width: 180px;
+                height: 270px;
+                bottom: 5%;
+            }
+            
+            .blessing-container {
+                padding: 15px;
+                margin: 10px;
+                min-height: 150px;
+            }
+            
+            .blessing-title {
+                font-size: 22px;
+            }
+            
+            .blessing-text {
+                font-size: 18px;
+                min-height: 120px;
+            }
+            
+            #main-screen {
+                padding: 10px;
             }
         }
         
+        /* 防止长按菜单 */
+        .no-context-menu {
+            -webkit-touch-callout: none;
+            -webkit-user-select: none;
+            -khtml-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            user-select: none;
+        }
+        
         /* 触摸设备优化 */
-        .gift-container:active .gift-image {
-            transform: scale(0.95);
+        .touch-feedback {
+            animation: touchPulse 0.3s ease-out;
+        }
+        
+        @keyframes touchPulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(0.95); }
+            100% { transform: scale(1); }
         }
     </style>
 </head>
 <body>
     <!-- 背景图片 -->
     <div id="background-container">
-        <img id="background-image" src="assets/images/background.jpg" alt="圣诞背景">
+        <img id="background-image" src="" alt="圣诞背景">
     </div>
     
-    <!-- 雪花容器 -->
+    <!-- 雪花容器 - 现在在最前面 -->
     <div class="snow-container" id="snowContainer"></div>
     
     <!-- 第一阶段：礼盒界面 -->
@@ -737,7 +1007,7 @@
         <div class="gift-container" id="giftContainer">
             <!-- 点击引导箭头（在礼盒上方） -->
             <div class="click-arrow">👇</div>
-            <img src="assets/images/gift-box.png" alt="圣诞礼盒" class="gift-image" id="giftImage">
+            <img src="" alt="圣诞礼盒" class="gift-image" id="giftImage">
         </div>
         <div class="instruction">点击礼盒开启圣诞惊喜</div>
     </div>
@@ -745,29 +1015,23 @@
     <!-- 爆炸粒子容器 -->
     <div class="explosion-container" id="explosionContainer"></div>
     
-    <!-- 9秒硬控覆盖层 -->
+    <!-- 10秒硬控覆盖层 -->
     <div class="hard-control-overlay" id="hardControlOverlay"></div>
     
     <!-- 圣诞老人飞到中间动画 -->
-    <video class="santa-flying-center" id="santaFlyingCenter" loop muted playsinline>
-        <source src="assets/video/santa.webm" type="video/webm">
-        <img src="assets/images/santa-fallback.png" alt="圣诞老人">
-    </video>
+    <img class="santa-flying-center" id="santaFlyingCenter" src="" alt="圣诞老人">
     
     <!-- 撒礼物容器 -->
     <div class="gift-drop-container" id="giftDropContainer"></div>
     
-    <!-- 圣诞老人动图 - 礼盒阶段 -->
-    <video class="santa-video" id="santaOpening" loop muted playsinline>
-        <source src="assets/video/santa.webm" type="video/webm">
-        <img src="assets/images/santa-fallback.png" alt="圣诞老人">
-    </video>
+    <!-- 圣诞老人图片 - 礼盒阶段 -->
+    <img class="santa-image" id="santaOpening" src="" alt="圣诞老人">
     
     <!-- 第二阶段：主界面 -->
     <div id="main-screen">
         <!-- 祝福语区域 -->
         <div class="blessing-container">
-            <h2 class="blessing-title">🎅 MerryChristmas！🎄</h2>
+            <h2 class="blessing-title">🎅 圣诞祝福 🎅</h2>
             <div class="blessing-text" id="blessingText">
                 <!-- 打字机效果会在这里显示文字 -->
             </div>
@@ -775,34 +1039,111 @@
         
         <!-- 圣诞树区域 -->
         <div class="tree-container">
-            <img src="assets/images/christmas-tree.png" alt="圣诞树" class="tree-image" id="christmasTree">
+            <img src="" alt="圣诞树" class="tree-image" id="christmasTree">
             <div class="tree-title">点击装饰品和它们玩捉迷藏</div>
         </div>
         
-        <!-- 圣诞老人动图 - 主界面阶段（从左到右） -->
-        <video class="santa-video santa-left-to-right" id="santaMain1" loop muted playsinline>
-            <source src="assets/video/santa.webm" type="video/webm">
-            <img src="assets/images/santa-fallback.png" alt="圣诞老人">
-        </video>
+        <!-- 圣诞老人图片 - 主界面阶段（从左到右） -->
+        <img class="santa-image santa-left-to-right" id="santaMain1" src="" alt="圣诞老人">
         
-        <!-- 圣诞老人动图 - 主界面阶段（从右到左） -->
-        <video class="santa-video santa-right-to-left" id="santaMain2" loop muted playsinline>
-            <source src="assets/video/santa.webm" type="video/webm">
-            <img src="assets/images/santa-fallback.png" alt="圣诞老人">
-        </video>
+        <!-- 圣诞老人图片 - 主界面阶段（从右到左） -->
+        <img class="santa-image santa-right-to-left" id="santaMain2" src="" alt="圣诞老人">
     </div>
 
+    <!-- 加载指示器 -->
+    <div class="loading-indicator" id="loadingIndicator">加载素材中...</div>
+
+    <!-- 手动播放按钮 -->
+    <button id="manual-play-btn">🎵 点此开启背景音乐</button>
+
     <!-- 音频元素 -->
-    <audio id="openingMusic" preload="auto" loop>
-        <source src="assets/audio/opening.mp3" type="audio/mpeg">
+    <audio id="openingMusic" preload="auto">
+        <source src="" type="audio/mpeg">
     </audio>
     
-    <audio id="mainMusic" preload="auto" loop>
-        <source src="assets/audio/main.mp3" type="audio/mpeg">
+    <audio id="mainMusic" preload="auto">
+        <source src="" type="audio/mpeg">
     </audio>
 
     <script>
-        // 获取元素
+        // ============== 配置区 ==============
+        
+        // 重要：在这里设置您的素材路径！
+        const ASSETS_CONFIG = {
+            images: {
+                background: [
+                    'assets/images/background.jpg',
+                    'assets/images/background.jpeg',
+                    'assets/images/background.png',
+                    'background.jpg',
+                    'background.jpeg',
+                    'background.png'
+                ],
+                giftBox: [
+                    'assets/images/gift-box.png',
+                    'assets/images/gift-box.jpg',
+                    'assets/images/gift-box.jpeg',
+                    'gift-box.png',
+                    'gift-box.jpg'
+                ],
+                christmasTree: [
+                    'assets/images/christmas-tree.png',
+                    'assets/images/christmas-tree.jpg',
+                    'assets/images/christmas-tree.jpeg',
+                    'christmas-tree.png',
+                    'christmas-tree.jpg'
+                ],
+                santaFallback: [
+                    'santa-fallback.png',
+                    'assets/images/santa-fallback.png',
+                    'assets/images/santa-fallback.jpg'
+                ]
+            },
+            
+            audio: {
+                opening: [
+                    'assets/audio/opening.mp3',
+                    'assets/audio/opening.m4a',
+                    'opening.mp3'
+                ],
+                main: [
+                    'assets/audio/main.mp3',
+                    'assets/audio/main.m4a',
+                    'main.mp3'
+                ]
+            }
+        };
+        
+        // 祝福语数组
+        const blessings = [
+            "🎄 圣诞快乐！",
+            "🎁 愿你的圣诞节充满奇迹和欢乐！",
+            "✨ 愿圣诞的光芒照亮你的每一天！",
+            "🎅 愿圣诞老人带给你最美好的祝福！",
+            "❄️ 雪花飘落，祝福来到！",
+            "🌟 愿你的圣诞充满温馨与爱！",
+            "🦌 圣诞的钟声带来幸福与和平！",
+            "🔔 愿你在这个特别的季节里收获满满的快乐！",
+            "🕯️ 愿圣诞的烛光温暖你的心房！",
+            "🎉 祝你圣诞快乐，新年幸福！"
+        ];
+        
+        // 彩带颜色
+        const ribbonColors = ['#FF6B6B', '#4ECDC4', '#FFD166', '#06D6A0', '#118AB2', '#EF476F'];
+        
+        // 圣诞元素数组
+        const christmasElements = ['❄️', '🎄', '⭐', '🎁', '🎅', '🦌', '🔔', '🕯️', '🍪', '☃️'];
+        
+        // 装饰品颜色
+        const ornamentColors = ['#FF6B6B', '#FFD166', '#06D6A0', '#118AB2', '#EF476F', '#FF9A8B'];
+        
+        // 装饰品内容
+        const ornamentContents = ['🎄', '🎁', '⭐', '🔔', '🕯️', '🍬', '❄️', '🎀'];
+        
+        // 雪花图片数组
+        const snowImages = ['snow1.png', 'snow2.png', 'snow3.png'];
+        
+        // ============== 获取元素 ==============
         const giftScreen = document.getElementById('gift-screen');
         const mainScreen = document.getElementById('main-screen');
         const giftImage = document.getElementById('giftImage');
@@ -822,112 +1163,333 @@
         const treeContainer = document.querySelector('.tree-container');
         const hardControlOverlay = document.getElementById('hardControlOverlay');
         const giftDropContainer = document.getElementById('giftDropContainer');
+        const manualPlayBtn = document.getElementById('manual-play-btn');
+        const loadingIndicator = document.getElementById('loadingIndicator');
         
-        // 状态变量
+        // ============== 状态变量 ==============
         let isGiftOpened = false;
         let isOpeningAudioPlaying = false;
         let isMainAudioPlaying = false;
         let snowflakes = [];
-        let lastTrailTime = 0;
-        const trailInterval = 150;
         let hardControlTimeout;
+        let ornamentsData = [];
+        let bgmPlayAttempted = false;
+        let loadedAssets = 0;
+        let totalAssets = 0;
         
-        // 雪花图片数组
-        const snowImages = ['snow1.png', 'snow2.png', 'snow3.png'];
+        // 检测是否为移动端
+        const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
         
-        // 祝福语数组
-        const blessings = [
-            "🎅 祝您在圣诞节每一天都充满着欢乐！",
-            "✨ Wishing you and your loved ones a season of harmony, joy, and good health！",
-            "🔔 愿圣诞的钟声能带来love＆peace！",
-            "🦌 愿您在这个特别的节日里，收获满满的快乐与安康。！",
-            "🎉 最后祝华叔叔和明姨圣诞快乐，新年快乐！",
-        ];
+        // ============== 辅助函数：尝试加载多个路径 ==============
         
-        // 彩带颜色
-        const ribbonColors = ['#FF6B6B', '#4ECDC4', '#FFD166', '#06D6A0', '#118AB2', '#EF476F'];
-        
-        // 圣诞元素数组
-        const christmasElements = ['❄️', '🎄', '⭐', '🎁', '🎅', '🦌', '🔔', '🕯️', '🍪', '☃️'];
-        
-        // 装饰品颜色
-        const ornamentColors = ['#FF6B6B', '#FFD166', '#06D6A0', '#118AB2', '#EF476F', '#FF9A8B'];
-        
-        // 装饰品内容
-        const ornamentContents = ['🎄', '🎁', '⭐', '🔔', '🕯️', '🍬', '❄️', '🎀'];
-        
-        // 背景图片加载失败处理
-        backgroundImage.onerror = function() {
-            console.log("背景图片加载失败，使用默认背景色");
-            document.getElementById('background-container').style.display = 'none';
-        };
-        
-        // 礼盒图片加载失败处理
-        giftImage.onerror = function() {
-            console.log("礼盒图片加载失败，使用Emoji替代");
-            giftImage.style.display = 'none';
-            const emojiGift = document.createElement('div');
-            emojiGift.style.fontSize = '120px';
-            emojiGift.style.animation = 'pulse 2s infinite ease-in-out';
-            emojiGift.style.textAlign = 'center';
-            emojiGift.style.marginTop = '20px';
-            emojiGift.textContent = '🎁';
-            giftContainer.appendChild(emojiGift);
-        };
-        
-        // ============== 音频功能 ==============
-        
-        // 初始化音频
-        function initAudio() {
-            // 设置音频属性
-            openingMusic.volume = 0.5;
-            mainMusic.volume = 0.5;
+        function tryLoadAsset(element, urls, onSuccess, onError) {
+            if (!urls || urls.length === 0) {
+                onError();
+                return;
+            }
             
-            openingMusic.loop = true;
-            mainMusic.loop = true;
+            let currentIndex = 0;
             
-            // 现代浏览器需要用户交互才能播放音频
-            openingMusic.muted = false;
-            mainMusic.muted = false;
+            function tryNext() {
+                if (currentIndex >= urls.length) {
+                    onError();
+                    return;
+                }
+                
+                const url = urls[currentIndex];
+                console.log(`尝试加载: ${url}`);
+                
+                if (element.tagName === 'IMG') {
+                    const img = new Image();
+                    img.onload = function() {
+                        console.log(`图片加载成功: ${url}`);
+                        element.src = url;
+                        onSuccess();
+                    };
+                    img.onerror = function() {
+                        console.log(`图片加载失败: ${url}`);
+                        currentIndex++;
+                        tryNext();
+                    };
+                    img.src = url;
+                } 
+                else if (element.tagName === 'AUDIO') {
+                    const source = element.querySelector('source');
+                    if (source) {
+                        source.src = url;
+                        element.load();
+                        
+                        element.onloadeddata = function() {
+                            console.log(`音频加载成功: ${url}`);
+                            onSuccess();
+                        };
+                        
+                        element.onerror = function() {
+                            console.log(`音频加载失败: ${url}`);
+                            currentIndex++;
+                            tryNext();
+                        };
+                    } else {
+                        currentIndex++;
+                        tryNext();
+                    }
+                }
+            }
             
-            // 尝试预加载音频
-            openingMusic.load();
-            mainMusic.load();
-            
-            console.log("音频初始化完成");
+            tryNext();
         }
         
-        // 播放礼盒阶段音乐
-        function playOpeningMusic() {
-            if (isOpeningAudioPlaying) return;
+        // ============== 素材加载函数 ==============
+        
+        function loadAllAssets() {
+            showLoading();
+            
+            totalAssets = 7; // 增加了圣诞老人图片
+            
+            // 加载背景图片
+            tryLoadAsset(
+                backgroundImage,
+                ASSETS_CONFIG.images.background,
+                function() {
+                    console.log('背景图片加载成功');
+                    backgroundImage.style.display = 'block';
+                    assetLoaded();
+                },
+                function() {
+                    console.warn('所有背景图片路径都失败，使用纯色背景');
+                    document.getElementById('background-container').style.background = 'linear-gradient(to bottom, #0a2e1d 0%, #0d3b29 100%)';
+                    assetLoaded();
+                }
+            );
+            
+            // 加载礼盒图片
+            tryLoadAsset(
+                giftImage,
+                ASSETS_CONFIG.images.giftBox,
+                function() {
+                    console.log('礼盒图片加载成功');
+                    assetLoaded();
+                },
+                function() {
+                    console.warn('所有礼盒图片路径都失败，使用Emoji');
+                    giftImage.style.display = 'none';
+                    const emojiGift = document.createElement('div');
+                    emojiGift.style.fontSize = '120px';
+                    emojiGift.style.animation = 'pulse 2s infinite ease-in-out';
+                    emojiGift.style.textAlign = 'center';
+                    emojiGift.style.marginTop = '20px';
+                    emojiGift.textContent = '🎁';
+                    emojiGift.classList.add('no-context-menu');
+                    giftContainer.appendChild(emojiGift);
+                    assetLoaded();
+                }
+            );
+            
+            // 加载圣诞树图片
+            tryLoadAsset(
+                christmasTree,
+                ASSETS_CONFIG.images.christmasTree,
+                function() {
+                    console.log('圣诞树图片加载成功');
+                    assetLoaded();
+                },
+                function() {
+                    console.warn('所有圣诞树图片路径都失败，使用Emoji');
+                    christmasTree.style.display = 'none';
+                    const emojiTree = document.createElement('div');
+                    emojiTree.style.fontSize = '200px';
+                    emojiTree.style.animation = 'pulse 2s infinite ease-in-out';
+                    emojiTree.style.textAlign = 'center';
+                    emojiTree.textContent = '🎄';
+                    emojiTree.classList.add('no-context-menu');
+                    treeContainer.insertBefore(emojiTree, treeContainer.firstChild);
+                    assetLoaded();
+                }
+            );
+            
+            // 加载圣诞老人图片（开场）
+            tryLoadAsset(
+                santaOpening,
+                ASSETS_CONFIG.images.santaFallback,
+                function() {
+                    console.log('开场圣诞老人图片加载成功');
+                    assetLoaded();
+                },
+                function() {
+                    console.warn('所有圣诞老人图片路径都失败');
+                    santaOpening.style.display = 'none';
+                    assetLoaded();
+                }
+            );
+            
+            // 加载飞行圣诞老人图片
+            tryLoadAsset(
+                santaFlyingCenter,
+                ASSETS_CONFIG.images.santaFallback,
+                function() {
+                    console.log('飞行圣诞老人图片加载成功');
+                    assetLoaded();
+                },
+                function() {
+                    console.warn('飞行圣诞老人图片加载失败');
+                    santaFlyingCenter.style.display = 'none';
+                    assetLoaded();
+                }
+            );
+            
+            // 加载主界面圣诞老人图片1
+            tryLoadAsset(
+                santaMain1,
+                ASSETS_CONFIG.images.santaFallback,
+                function() {
+                    console.log('主界面圣诞老人1图片加载成功');
+                    assetLoaded();
+                },
+                function() {
+                    console.warn('主界面圣诞老人1图片加载失败');
+                    santaMain1.style.display = 'none';
+                    assetLoaded();
+                }
+            );
+            
+            // 加载主界面圣诞老人图片2
+            tryLoadAsset(
+                santaMain2,
+                ASSETS_CONFIG.images.santaFallback,
+                function() {
+                    console.log('主界面圣诞老人2图片加载成功');
+                    assetLoaded();
+                },
+                function() {
+                    console.warn('主界面圣诞老人2图片加载失败');
+                    santaMain2.style.display = 'none';
+                    assetLoaded();
+                }
+            );
+            
+            // 加载开场音频
+            tryLoadAsset(
+                openingMusic,
+                ASSETS_CONFIG.audio.opening,
+                function() {
+                    console.log('开场音频加载成功');
+                    assetLoaded();
+                },
+                function() {
+                    console.warn('所有开场音频路径都失败');
+                    assetLoaded();
+                }
+            );
+            
+            // 加载主界面音频
+            tryLoadAsset(
+                mainMusic,
+                ASSETS_CONFIG.audio.main,
+                function() {
+                    console.log('主界面音频加载成功');
+                    assetLoaded();
+                },
+                function() {
+                    console.warn('所有主界面音频路径都失败');
+                    assetLoaded();
+                }
+            );
+        }
+        
+        function assetLoaded() {
+            loadedAssets++;
+            console.log(`已加载 ${loadedAssets}/${totalAssets} 个资源`);
+            
+            if (loadedAssets >= totalAssets) {
+                hideLoading();
+                initPage();
+            }
+        }
+        
+        function showLoading() {
+            loadingIndicator.style.display = 'block';
+        }
+        
+        function hideLoading() {
+            setTimeout(() => {
+                loadingIndicator.style.display = 'none';
+                console.log('所有资源加载完成');
+            }, 500);
+        }
+        
+        // ============== 页面初始化 ==============
+        
+        function initPage() {
+            console.log('页面初始化开始');
+            
+            // 显示礼盒阶段的圣诞老人
+            santaOpening.classList.add('visible');
+            
+            // 修复：立即启动雪花效果
+            startSnow();
+            
+            console.log('页面初始化完成');
+        }
+        
+        // ============== 音频核心逻辑 ==============
+        
+        function preloadAudio() {
+            openingMusic.muted = true;
+            mainMusic.muted = true;
+            openingMusic.preload = 'auto';
+            mainMusic.preload = 'auto';
+            
+            const loadPromise1 = openingMusic.play();
+            if (loadPromise1 !== undefined) {
+                loadPromise1.then(() => {
+                    openingMusic.pause();
+                    console.log('开场音频预加载成功');
+                }).catch(e => {
+                    console.log('开场音频预加载被阻止');
+                });
+            }
+            
+            const loadPromise2 = mainMusic.play();
+            if (loadPromise2 !== undefined) {
+                loadPromise2.then(() => {
+                    mainMusic.pause();
+                    console.log('主界面音频预加载成功');
+                }).catch(e => {
+                    console.log('主界面音频预加载被阻止');
+                });
+            }
             
             openingMusic.muted = false;
-            openingMusic.volume = 0.5;
+            mainMusic.muted = false;
+        }
+        
+        function playOpeningMusic() {
+            if (bgmPlayAttempted) return;
+            
+            bgmPlayAttempted = true;
             openingMusic.currentTime = 0;
             
             const playPromise = openingMusic.play();
             
             if (playPromise !== undefined) {
                 playPromise.then(() => {
-                    console.log('礼盒阶段音乐播放成功');
+                    console.log('开场音乐播放成功');
+                    manualPlayBtn.style.display = 'none';
                     isOpeningAudioPlaying = true;
                 }).catch(error => {
-                    console.warn('礼盒阶段音频播放失败:', error);
+                    console.warn('开场音乐自动播放被阻止:', error);
+                    showManualPlayButton();
                 });
             }
         }
         
-        // 播放主界面音乐
         function playMainMusic() {
-            // 停止礼盒阶段音乐
             if (isOpeningAudioPlaying) {
                 openingMusic.pause();
                 openingMusic.currentTime = 0;
                 isOpeningAudioPlaying = false;
             }
             
-            mainMusic.muted = false;
-            mainMusic.volume = 0.5;
             mainMusic.currentTime = 0;
             
             const playPromise = mainMusic.play();
@@ -935,187 +1497,178 @@
             if (playPromise !== undefined) {
                 playPromise.then(() => {
                     console.log('主界面音乐播放成功');
+                    manualPlayBtn.style.display = 'none';
                     isMainAudioPlaying = true;
                 }).catch(error => {
-                    console.warn('主界面音频播放失败:', error);
+                    console.warn('主界面音乐播放失败:', error);
+                    showManualPlayButton();
                 });
             }
         }
         
-        // ============== 雪花效果 - 修复拖尾位置 ==============
-        
-        // 创建雪花拖尾粒子 - 修复：拖尾在雪花后面
-        function createSnowTrail(x, y, size, opacity) {
-            const trail = document.createElement('div');
-            trail.className = 'snow-trail';
-            
-            // 设置位置和大小 - 拖尾在雪花的上方一点（形成拖尾效果）
-            trail.style.left = `${x}px`;
-            trail.style.top = `${y - size * 0.3}px`;
-            trail.style.width = `${size * 0.5}px`;
-            trail.style.height = `${size * 0.5}px`;
-            trail.style.opacity = opacity * 0.8;
-            trail.style.backgroundColor = `rgba(255, 255, 255, ${opacity * 0.8})`;
-            
-            snowContainer.appendChild(trail);
-            
-            // 动画：从上方向雪花当前位置移动并消失
-            const animation = trail.animate([
-                { 
-                    opacity: opacity * 0.8, 
-                    transform: 'translateY(-5px) scale(1)',
-                },
-                { 
-                    opacity: 0, 
-                    transform: 'translateY(5px) scale(0.8)',
-                }
-            ], {
-                duration: 800,
-                easing: 'ease-out'
-            });
-            
-            animation.onfinish = () => {
-                if (trail.parentNode) {
-                    trail.remove();
-                }
-            };
+        function showManualPlayButton() {
+            manualPlayBtn.style.display = 'block';
+            manualPlayBtn.textContent = '🎵 点此开启背景音乐';
+            manualPlayBtn.classList.remove('error');
         }
         
-        // 创建雪花
-        function createSnowflake() {
-            const snowflake = document.createElement('img');
-            snowflake.className = 'snowflake';
-            
-            const randomImage = snowImages[Math.floor(Math.random() * snowImages.length)];
-            snowflake.src = `assets/images/${randomImage}`;
-            
-            const size = 15 + Math.random() * 25;
-            snowflake.style.width = `${size}px`;
-            snowflake.style.height = `${size}px`;
-            
-            const leftPos = Math.random() * 100;
-            snowflake.style.left = `${leftPos}%`;
-            
-            const opacity = 0.4 + Math.random() * 0.6;
-            snowflake.style.opacity = opacity;
-            
-            const xDrift = Math.random() * 40 - 20;
-            snowflake.style.setProperty('--snow-x', `${xDrift}px`);
-            
-            const fallDuration = 12 + Math.random() * 18;
-            snowflake.style.animationDuration = `${fallDuration}s`;
-            
-            const delay = Math.random() * 5;
-            snowflake.style.animationDelay = `${delay}s`;
-            
-            const snowflakeData = {
-                element: snowflake,
-                size: size,
-                opacity: opacity,
-                lastTrailTime: 0
-            };
-            
-            snowContainer.appendChild(snowflake);
-            snowflakes.push(snowflakeData);
-            
-            setTimeout(() => {
-                const index = snowflakes.indexOf(snowflakeData);
-                if (index > -1) {
-                    snowflakes.splice(index, 1);
+        manualPlayBtn.addEventListener('click', function() {
+            if (isOpeningAudioPlaying || isMainAudioPlaying) {
+                if (isOpeningAudioPlaying) {
+                    openingMusic.muted = !openingMusic.muted;
+                    this.textContent = openingMusic.muted ? '🔇 取消静音' : '🔊 音乐播放中';
+                } else if (isMainAudioPlaying) {
+                    mainMusic.muted = !mainMusic.muted;
+                    this.textContent = mainMusic.muted ? '🔇 取消静音' : '🔊 音乐播放中';
                 }
-                
-                if (snowflake.parentNode) {
-                    snowflake.remove();
+            } else {
+                if (isGiftOpened) {
+                    mainMusic.play().then(() => {
+                        this.style.display = 'none';
+                    }).catch(e => {
+                        this.textContent = '🎵 播放失败，请检查浏览器设置';
+                        this.classList.add('error');
+                    });
+                } else {
+                    openingMusic.play().then(() => {
+                        this.style.display = 'none';
+                    }).catch(e => {
+                        this.textContent = '🎵 播放失败，请检查浏览器设置';
+                        this.classList.add('error');
+                    });
                 }
-                
-                createSnowflake();
-            }, (fallDuration + delay) * 1000);
-            
-            return snowflakeData;
-        }
-        
-        // 更新雪花位置并创建拖尾
-        function updateSnowflakes() {
-            const currentTime = Date.now();
-            
-            if (currentTime - lastTrailTime > trailInterval) {
-                snowflakes.forEach(snowflake => {
-                    const rect = snowflake.element.getBoundingClientRect();
-                    const x = rect.left + rect.width / 2;
-                    const y = rect.top + rect.height / 2;
-                    
-                    createSnowTrail(x, y, snowflake.size, snowflake.opacity);
-                });
-                
-                lastTrailTime = currentTime;
             }
-            
-            requestAnimationFrame(updateSnowflakes);
-        }
+        });
         
-        // 开始下雪
+        // ============== 雪花效果 - 简化版 ==============
+        
         function startSnow() {
-            snowContainer.innerHTML = '';
-            snowflakes = [];
+            console.log('开始雪花效果');
             
-            for (let i = 0; i < 25; i++) {
+            // 清空现有雪花容器
+            snowContainer.innerHTML = '';
+            
+            const snowflakes = [];
+            
+            function createSnowflake() {
+                const snowflake = document.createElement('div');
+                snowflake.className = 'snowflake';
+                
+                // 设置雪花大小
+                const size = isMobile ? 20 : 30;
+                snowflake.style.width = size + 'px';
+                snowflake.style.height = size + 'px';
+                
+                // 随机水平位置
+                const leftPos = Math.random() * 100;
+                snowflake.style.left = leftPos + '%';
+                
+                // 使用本地雪花图片（直接使用img标签，不依赖背景图片）
+                const randomImg = snowImages[Math.floor(Math.random() * snowImages.length)];
+                
+                // 创建图片元素来检查是否可用
+                const img = new Image();
+                img.onload = function() {
+                    // 图片加载成功，设置背景图片
+                    snowflake.style.backgroundImage = `url(${randomImg})`;
+                };
+                img.onerror = function() {
+                    // 图片加载失败，使用emoji
+                    snowflake.style.backgroundImage = 'none';
+                    snowflake.textContent = '❄️';
+                    snowflake.style.fontSize = (size * 0.8) + 'px';
+                    snowflake.style.textAlign = 'center';
+                    snowflake.style.lineHeight = size + 'px';
+                    snowflake.style.color = '#FFFFFF';
+                    snowflake.style.textShadow = '0 0 5px rgba(255, 255, 255, 0.8)';
+                };
+                
+                // 立即开始加载图片
+                img.src = randomImg;
+                
+                // 设置雪花透明度
+                snowflake.style.opacity = 0.7 + Math.random() * 0.3;
+                
+                // 设置水平漂移距离
+                const xDrift = Math.random() * 40 - 20; // -20px 到 20px
+                snowflake.style.setProperty('--snow-x', `${xDrift}px`);
+                
+                // 设置下落速度和延迟
+                const fallDuration = isMobile ? 15000 : 18000 + Math.random() * 12000;
+                snowflake.style.animationDuration = `${fallDuration}ms`;
+                
+                const delay = Math.random() * 5;
+                snowflake.style.animationDelay = `${delay}s`;
+                
+                // 添加到容器
+                snowContainer.appendChild(snowflake);
+                snowflakes.push(snowflake);
+                
+                // 雪花动画结束后重新创建
+                setTimeout(() => {
+                    if (snowflake.parentNode) {
+                        snowflake.remove();
+                    }
+                    const index = snowflakes.indexOf(snowflake);
+                    if (index > -1) snowflakes.splice(index, 1);
+                    
+                    // 创建新的雪花
+                    createSnowflake();
+                }, (fallDuration + delay * 1000));
+            }
+            
+            // 创建初始雪花
+            const snowflakeCount = isMobile ? 25 : 40;
+            
+            for (let i = 0; i < snowflakeCount; i++) {
                 setTimeout(() => {
                     createSnowflake();
-                }, i * 200);
+                }, i * 200); // 错开创建时间
             }
-            
-            updateSnowflakes();
         }
         
-        // ============== 9秒硬控动画 ==============
+        // ============== 10秒硬控动画 ==============
         
-        // 开始硬控动画
         function startHardControl() {
-            // 显示硬控覆盖层
+            console.log("开始10秒硬控动画！");
+            
             hardControlOverlay.style.display = 'flex';
             
-            // 显示圣诞老人飞向中间
             santaFlyingCenter.classList.add('visible');
             
-            // 2秒后开始撒礼物
             setTimeout(() => {
                 dropGifts();
             }, 2000);
             
-            // 9秒后结束硬控
             hardControlTimeout = setTimeout(() => {
                 endHardControl();
-            }, 9000);
+            }, 10000);
         }
         
-        // 撒礼物效果 - 修复
         function dropGifts() {
             const giftTypes = ['🎁', '🎄', '⭐', '🔔', '🎀', '🍬', '🍪', '🦌'];
-            const dropCount = 20;
+            const dropCount = isMobile ? 15 : 20;
             
             for (let i = 0; i < dropCount; i++) {
                 setTimeout(() => {
                     createGiftDrop(giftTypes[i % giftTypes.length]);
-                }, i * 300); // 每300毫秒撒一个礼物
+                }, i * 300);
             }
         }
         
-        // 创建单个礼物掉落效果 - 修复
         function createGiftDrop(giftType) {
             const gift = document.createElement('div');
             gift.className = 'dropped-gift';
             gift.textContent = giftType;
             
-            // 从屏幕中心开始
             const centerX = window.innerWidth / 2;
             const centerY = window.innerHeight / 2 - 100;
             
             gift.style.left = `${centerX}px`;
             gift.style.top = `${centerY}px`;
             
-            // 随机掉落方向
             const angle = Math.random() * Math.PI * 2;
-            const distance = 150 + Math.random() * 250;
+            const distance = isMobile ? 100 : 150 + Math.random() * 250;
             
             const x = Math.cos(angle) * distance;
             const y = Math.sin(angle) * distance;
@@ -1125,7 +1678,6 @@
             
             giftDropContainer.appendChild(gift);
             
-            // 3秒后移除礼物
             setTimeout(() => {
                 if (gift.parentNode) {
                     gift.remove();
@@ -1133,111 +1685,103 @@
             }, 3000);
         }
         
-        // 结束硬控
         function endHardControl() {
-            // 隐藏硬控覆盖层
+            console.log("10秒硬控结束，切换到主屏幕！");
+            
             hardControlOverlay.style.display = 'none';
             
-            // 隐藏圣诞老人
             santaFlyingCenter.classList.remove('visible');
             
-            // 清除撒礼物容器
             giftDropContainer.innerHTML = '';
             
-            // 切换到主界面
             giftScreen.style.display = "none";
             mainScreen.style.display = "flex";
             
-            // 显示两个圣诞老人
             santaMain1.classList.add('visible');
             santaMain2.classList.add('visible');
             
-            // 切换到主界面音乐
             playMainMusic();
             
-            // 开始下雪
-            startSnow();
+            // 新增：为主界面的圣诞树添加跳舞动画
+            christmasTree.classList.add('dancing');
             
-            // 设置圣诞树交互
             setupTreeInteraction();
             createOrnaments();
             
-            // 开始打字机效果
             typeWriterEffect();
-            
-            console.log("9秒硬控结束，切换到主屏幕！");
         }
         
-        // ============== 圣诞树交互增强 - 装饰品狡猾滑走 ==============
+        // ============== 圣诞树交互 ==============
         
-        // 创建圣诞树装饰品
         function createOrnaments() {
-            // 清空现有装饰品
             const existingOrnaments = treeContainer.querySelectorAll('.ornament');
             existingOrnaments.forEach(ornament => ornament.remove());
+            ornamentsData = [];
             
-            // 装饰品位置（相对圣诞树）
             const ornamentPositions = [
-                {top: '12%', left: '48%'},   // 树顶
-                {top: '22%', left: '38%'},   // 左上
-                {top: '22%', left: '58%'},   // 右上
-                {top: '32%', left: '32%'},   // 左中上
-                {top: '32%', left: '48%'},   // 中上
-                {top: '32%', left: '64%'},   // 右中上
-                {top: '45%', left: '42%'},   // 左中
-                {top: '45%', left: '54%'},   // 右中
-                {top: '58%', left: '46%'},   // 左下
-                {top: '58%', left: '52%'},   // 中下
-                {top: '70%', left: '48%'},   // 底部
+                {top: '12%', left: '48%'},
+                {top: '22%', left: '38%'},
+                {top: '22%', left: '58%'},
+                {top: '32%', left: '32%'},
+                {top: '32%', left: '48%'},
+                {top: '32%', left: '64%'},
+                {top: '45%', left: '42%'},
+                {top: '45%', left: '54%'},
+                {top: '58%', left: '46%'},
+                {top: '58%', left: '52%'},
+                {top: '70%', left: '48%'},
             ];
             
             ornamentPositions.forEach((pos, index) => {
                 const ornament = document.createElement('div');
                 ornament.className = 'ornament';
+                ornament.dataset.id = index;
+                ornament.dataset.originalTop = pos.top;
+                ornament.dataset.originalLeft = pos.left;
+                ornament.classList.add('no-context-menu');
+                
                 ornament.style.top = pos.top;
                 ornament.style.left = pos.left;
                 ornament.style.backgroundColor = ornamentColors[index % ornamentColors.length];
                 ornament.style.boxShadow = `0 0 15px ${ornamentColors[index % ornamentColors.length]}`;
                 
-                // 添加装饰品内容
                 ornament.textContent = ornamentContents[index % ornamentContents.length];
                 
-                // 添加装饰品动画
-                ornament.style.animation = `pulse ${2 + Math.random() * 2}s infinite ease-in-out`;
+                ornamentsData.push({
+                    id: index,
+                    element: ornament,
+                    originalTop: pos.top,
+                    originalLeft: pos.left,
+                    isEscaping: false,
+                    isReturning: false
+                });
                 
-                // 点击装饰品效果 - 狡猾滑走
                 ornament.addEventListener('click', function(e) {
                     e.stopPropagation();
+                    const ornamentId = parseInt(this.dataset.id);
+                    const ornamentInfo = ornamentsData.find(o => o.id === ornamentId);
                     
-                    // 如果装饰品正在滑走或回归，不处理
-                    if (this.classList.contains('escaping') || this.classList.contains('returning')) {
+                    if (ornamentInfo.isEscaping || ornamentInfo.isReturning) {
                         return;
                     }
                     
-                    // 添加滑走类
+                    ornamentInfo.isEscaping = true;
                     this.classList.add('escaping');
                     
-                    // 生成狡猾的逃跑路径（4个关键点，形成曲折路径）
-                    const treeRect = treeContainer.getBoundingClientRect();
+                    const escapeX1 = -Math.random() * 80 - 40;
+                    const escapeY1 = -Math.random() * 60 - 30;
                     
-                    // 第一阶段：快速向左上逃跑
-                    const escapeX1 = -Math.random() * 100 - 50;
-                    const escapeY1 = -Math.random() * 80 - 40;
+                    const escapeX2 = escapeX1 + Math.random() * 120 + 60;
+                    const escapeY2 = escapeY1 + Math.random() * 100 + 50;
                     
-                    // 第二阶段：突然转向右下
-                    const escapeX2 = escapeX1 + Math.random() * 150 + 80;
-                    const escapeY2 = escapeY1 + Math.random() * 120 + 60;
+                    const escapeX3 = escapeX2 - Math.random() * 80 - 40;
+                    const escapeY3 = escapeY2 - Math.random() * 50 - 25;
                     
-                    // 第三阶段：再次转向左上
-                    const escapeX3 = escapeX2 - Math.random() * 100 - 50;
-                    const escapeY3 = escapeY2 - Math.random() * 60 - 30;
-                    
-                    // 第四阶段：最终躲在屏幕边缘
                     const screenEdge = Math.random() > 0.5 ? 1 : -1;
-                    const escapeX4 = screenEdge * (Math.random() * 100 + 200);
+                    const escapeX4 = screenEdge * (Math.random() * 80 + 150);
                     const escapeY4 = Math.random() > 0.5 ? 
-                        Math.random() * 100 + 50 : 
-                        -Math.random() * 100 - 50;
+                        Math.random() * 80 + 40 : 
+                        -Math.random() * 80 - 40;
                     
                     this.style.setProperty('--escape-x1', `${escapeX1}px`);
                     this.style.setProperty('--escape-y1', `${escapeY1}px`);
@@ -1248,19 +1792,28 @@
                     this.style.setProperty('--escape-x4', `${escapeX4}px`);
                     this.style.setProperty('--escape-y4', `${escapeY4}px`);
                     
-                    // 创建星星粒子效果
-                    createStarEffect(this, 6);
+                    createStarEffect(this, 8);
                     
-                    // 2秒后自动回归
                     setTimeout(() => {
                         if (this.parentNode && this.classList.contains('escaping')) {
+                            ornamentInfo.isEscaping = false;
+                            ornamentInfo.isReturning = true;
                             this.classList.remove('escaping');
                             this.classList.add('returning');
                             
-                            // 3秒后移除回归类，恢复可点击状态
+                            this.style.setProperty('--escape-x4', `${escapeX4}px`);
+                            this.style.setProperty('--escape-y4', `${escapeY4}px`);
+                            
                             setTimeout(() => {
                                 if (this.parentNode) {
                                     this.classList.remove('returning');
+                                    ornamentInfo.isReturning = false;
+                                    
+                                    this.style.transform = 'translate(0, 0)';
+                                    this.style.top = ornamentInfo.originalTop;
+                                    this.style.left = ornamentInfo.originalLeft;
+                                    
+                                    createStarEffect(this, 6);
                                 }
                             }, 1500);
                         }
@@ -1271,57 +1824,53 @@
             });
         }
         
-        // 创建星星粒子效果
         function createStarEffect(element, count = 8) {
             const rect = element.getBoundingClientRect();
             const centerX = rect.left + rect.width / 2;
             const centerY = rect.top + rect.height / 2;
             
             for (let i = 0; i < count; i++) {
-                const star = document.createElement('div');
-                star.textContent = '✨';
-                star.style.position = 'fixed';
-                star.style.left = `${centerX}px`;
-                star.style.top = `${centerY}px`;
-                star.style.fontSize = '20px';
-                star.style.zIndex = '20';
-                star.style.pointerEvents = 'none';
-                
-                const angle = Math.random() * Math.PI * 2;
-                const distance = 30 + Math.random() * 50;
-                
-                document.body.appendChild(star);
-                
-                const animation = star.animate([
-                    { 
-                        transform: 'translate(0, 0) scale(0)', 
-                        opacity: 1 
-                    },
-                    { 
-                        transform: `translate(${Math.cos(angle) * distance}px, ${Math.sin(angle) * distance}px) scale(1.5)`, 
-                        opacity: 0 
-                    }
-                ], {
-                    duration: 800,
-                    easing: 'ease-out'
-                });
-                
-                animation.onfinish = () => {
-                    if (star.parentNode) {
-                        star.remove();
-                    }
-                };
+                setTimeout(() => {
+                    const star = document.createElement('div');
+                    star.textContent = '✨';
+                    star.style.position = 'fixed';
+                    star.style.left = `${centerX}px`;
+                    star.style.top = `${centerY}px`;
+                    star.style.fontSize = '20px';
+                    star.style.zIndex = '20';
+                    star.style.pointerEvents = 'none';
+                    star.classList.add('no-context-menu');
+                    
+                    const angle = Math.random() * Math.PI * 2;
+                    const distance = 30 + Math.random() * 50;
+                    
+                    document.body.appendChild(star);
+                    
+                    const animation = star.animate([
+                        { 
+                            transform: 'translate(0, 0) scale(0)', 
+                            opacity: 1 
+                        },
+                        { 
+                            transform: `translate(${Math.cos(angle) * distance}px, ${Math.sin(angle) * distance}px) scale(1.5)`, 
+                            opacity: 0 
+                        }
+                    ], {
+                        duration: 800,
+                        easing: 'ease-out'
+                    });
+                    
+                    animation.onfinish = () => {
+                        if (star.parentNode) {
+                            star.remove();
+                        }
+                    };
+                }, i * 50);
             }
         }
         
-        // 圣诞树点击事件
         function setupTreeInteraction() {
-            // 圣诞树闪烁效果
-            setInterval(() => {
-                christmasTree.classList.toggle('glow');
-            }, 2000);
-            
-            // 圣诞树旋转效果
+            // 圣诞树点击旋转效果
             let treeRotation = 0;
             let isRotating = false;
             
@@ -1329,14 +1878,14 @@
                 if (isRotating) return;
                 isRotating = true;
                 
-                // 随机旋转角度
+                // 暂停跳舞动画
+                this.classList.remove('dancing');
+                
                 treeRotation += 120 + Math.random() * 120;
                 
-                // 应用旋转
                 this.style.transition = 'transform 1.2s cubic-bezier(0.34, 1.56, 0.64, 1)';
                 this.style.transform = `rotate(${treeRotation}deg)`;
                 
-                // 创建大量星星效果
                 const rect = this.getBoundingClientRect();
                 const centerX = rect.left + rect.width / 2;
                 const centerY = rect.top + rect.height / 2;
@@ -1352,63 +1901,46 @@
                     }, i * 50);
                 }
                 
-                // 重置旋转状态
                 setTimeout(() => {
+                    this.style.transition = '';
+                    this.style.transform = '';
+                    // 恢复跳舞动画
+                    this.classList.add('dancing');
                     isRotating = false;
                 }, 1200);
             });
         }
         
-        // ============== 打字机效果 ==============
+        // ============== 打字机效果 - 优化版 ==============
         
         async function typeWriterEffect() {
             const textElement = blessingText;
             textElement.innerHTML = '';
             
-            const cursor = document.createElement('span');
-            cursor.className = 'typing-cursor';
-            textElement.appendChild(cursor);
-            
             for (let i = 0; i < blessings.length; i++) {
                 const sentence = blessings[i];
-                let lineElement = document.createElement('div');
-                textElement.insertBefore(lineElement, cursor);
                 
+                // 创建每行容器
+                const lineDiv = document.createElement('div');
+                lineDiv.className = 'blessing-line';
+                lineDiv.style.animationDelay = `${i * 0.2}s`;
+                textElement.appendChild(lineDiv);
+                
+                // 添加打字机效果
                 for (let j = 0; j < sentence.length; j++) {
-                    lineElement.textContent += sentence[j];
-                    
-                    const speed = 50 + Math.random() * 50;
-                    await new Promise(resolve => setTimeout(resolve, speed));
+                    lineDiv.textContent += sentence[j];
+                    await new Promise(r => setTimeout(r, 80 + Math.random() * 40));
                 }
                 
-                await new Promise(resolve => setTimeout(resolve, 800));
-                
-                if (i < blessings.length - 1) {
-                    lineElement = document.createElement('div');
-                    textElement.insertBefore(lineElement, cursor);
-                }
+                // 每句之间的停顿
+                await new Promise(r => setTimeout(r, 600));
             }
-            
-            cursor.remove();
         }
         
         // ============== 礼盒点击事件 ==============
         
         giftContainer.addEventListener('click', openGift);
-        
-        document.querySelector('.instruction').addEventListener('click', function() {
-            giftContainer.style.animation = 'none';
-            giftContainer.offsetHeight;
-            giftContainer.style.animation = 'pulse 0.5s ease-in-out';
-            
-            clickArrow.style.animation = 'none';
-            clickArrow.offsetHeight;
-            clickArrow.style.animation = 'arrowBounce 0.3s ease-in-out 3';
-            
-            setTimeout(() => {
-                clickArrow.style.animation = 'arrowBounce 1.5s infinite';
-            }, 900);
-        });
+        document.querySelector('.instruction').addEventListener('click', openGift);
         
         function openGift() {
             if (isGiftOpened) return;
@@ -1416,30 +1948,21 @@
             
             console.log("礼盒被点击了！");
             
-            // 播放礼盒阶段音乐
             playOpeningMusic();
             
-            // 隐藏礼盒阶段的圣诞老人
             santaOpening.classList.remove('visible');
             
-            // 隐藏箭头
             clickArrow.style.display = 'none';
             
-            // 礼盒开始缩小
             giftImage.classList.add('shrink');
             
-            // 延迟后创建爆炸效果
             setTimeout(() => {
                 createRibbonExplosion();
                 createChristmasElements();
             }, 800);
             
-            // 延迟后开始9秒硬控
             setTimeout(() => {
-                // 开始9秒硬控动画
                 startHardControl();
-                
-                console.log("开始9秒硬控动画！");
             }, 1500);
         }
         
@@ -1518,29 +2041,40 @@
             }
         }
         
-        // ============== 页面初始化 ==============
+        // ============== 页面加载 ==============
         
         window.addEventListener('load', function() {
-            console.log("页面加载完成");
+            console.log('页面加载完成');
             
-            // 初始化音频
-            initAudio();
+            // 立即开始雪花效果，不等待其他资源
+            startSnow();
             
-            // 显示礼盒阶段的圣诞老人
-            santaOpening.classList.add('visible');
+            // 然后加载其他资源
+            loadAllAssets();
             
-            // 预加载图片
-            const giftImg = new Image();
-            giftImg.src = 'assets/images/gift-box.png';
-            
-            const bgImg = new Image();
-            bgImg.src = 'assets/images/background.jpg';
-            
-            snowImages.forEach(img => {
-                const snowImg = new Image();
-                snowImg.src = `assets/images/${img}`;
-            });
+            preloadAudio();
         });
+        
+        window.addEventListener('resize', function() {
+            if (ornamentsData.length > 0) {
+                ornamentsData.forEach(ornamentInfo => {
+                    if (ornamentInfo.element && ornamentInfo.element.parentNode) {
+                        ornamentInfo.element.style.top = ornamentInfo.originalTop;
+                        ornamentInfo.element.style.left = ornamentInfo.originalLeft;
+                        ornamentInfo.element.style.transform = 'translate(0, 0)';
+                    }
+                });
+            }
+        });
+        
+        let lastTouchEnd = 0;
+        document.addEventListener('touchend', function(event) {
+            const now = Date.now();
+            if (now - lastTouchEnd <= 300) event.preventDefault();
+            lastTouchEnd = now;
+        }, false);
+        
+        console.log("脚本初始化完成");
     </script>
 </body>
 </html>
