@@ -751,26 +751,83 @@
             animation: treeGlow 2s infinite;
         }
         
-        /* 手动播放按钮样式 - 移动端隐藏 */
-        #manual-play-btn {
+        /* 音乐控制面板 - 新的设计 */
+        .music-controls {
             position: fixed;
-            bottom: 20px;
-            left: 50%;
-            transform: translateX(-50%);
+            top: 20px;
+            right: 20px;
             z-index: 2000;
-            padding: 12px 24px;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            border: none;
-            border-radius: 30px;
-            font-size: 16px;
-            font-weight: bold;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
-            cursor: pointer;
-            display: none;
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+            gap: 10px;
         }
-        #manual-play-btn.error {
-            background: #ff6b6b;
+        
+        /* 音乐按钮 - 新设计 */
+        .music-btn {
+            background: rgba(196, 30, 58, 0.7);
+            border: 2px solid #FFD700;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            color: white;
+            font-size: 24px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+            transition: all 0.3s ease;
+            backdrop-filter: blur(5px);
+            -webkit-user-select: none;
+            user-select: none;
+        }
+        
+        .music-btn:hover {
+            transform: scale(1.1);
+            background: rgba(196, 30, 58, 0.9);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.4);
+        }
+        
+        .music-btn.muted {
+            opacity: 0.7;
+            border-color: #888;
+        }
+        
+        .music-btn.muted::after {
+            content: "";
+            position: absolute;
+            width: 2px;
+            height: 35px;
+            background: #FFD700;
+            transform: rotate(45deg);
+        }
+        
+        /* 自动播放提示 */
+        .auto-play-hint {
+            position: fixed;
+            top: 80px;
+            right: 20px;
+            z-index: 2000;
+            background: rgba(196, 30, 58, 0.8);
+            border: 2px solid #FFD700;
+            border-radius: 15px;
+            padding: 12px 18px;
+            color: white;
+            font-size: 14px;
+            max-width: 200px;
+            text-align: center;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+            backdrop-filter: blur(5px);
+            animation: fadeInOut 3s ease-in-out;
+            display: none;
+            -webkit-user-select: none;
+            user-select: none;
+        }
+        
+        @keyframes fadeInOut {
+            0%, 100% { opacity: 0; transform: translateY(-10px); }
+            20%, 80% { opacity: 1; transform: translateY(0); }
         }
         
         /* 加载指示器 */
@@ -865,9 +922,24 @@
                 font-size: 35px;
             }
             
-            /* 移动端隐藏手动播放按钮 */
-            #manual-play-btn {
-                display: none !important;
+            /* 移动端音乐按钮调整 */
+            .music-controls {
+                top: 15px;
+                right: 15px;
+            }
+            
+            .music-btn {
+                width: 45px;
+                height: 45px;
+                font-size: 22px;
+            }
+            
+            .auto-play-hint {
+                top: 70px;
+                right: 15px;
+                font-size: 13px;
+                padding: 10px 15px;
+                max-width: 180px;
             }
         }
         
@@ -945,8 +1017,23 @@
                 font-size: 30px;
             }
             
-            #manual-play-btn {
-                display: none !important;
+            .music-controls {
+                top: 10px;
+                right: 10px;
+            }
+            
+            .music-btn {
+                width: 42px;
+                height: 42px;
+                font-size: 20px;
+            }
+            
+            .auto-play-hint {
+                top: 60px;
+                right: 10px;
+                font-size: 12px;
+                padding: 8px 12px;
+                max-width: 160px;
             }
         }
         
@@ -999,6 +1086,11 @@
             
             #main-screen {
                 padding: 10px;
+            }
+            
+            .music-controls {
+                top: 10px;
+                right: 10px;
             }
         }
         
@@ -1081,11 +1173,16 @@
         <img class="santa-image santa-right-to-left" id="santaMain2" src="" alt="圣诞老人">
     </div>
 
+    <!-- 音乐控制面板 -->
+    <div class="music-controls" id="musicControls">
+        <div class="music-btn" id="musicBtn" title="点击播放/暂停音乐">🎵</div>
+    </div>
+    
+    <!-- 自动播放提示 -->
+    <div class="auto-play-hint" id="autoPlayHint"></div>
+
     <!-- 加载指示器 -->
     <div class="loading-indicator" id="loadingIndicator">加载素材中...</div>
-
-    <!-- 手动播放按钮 - 移动端将隐藏 -->
-    <button id="manual-play-btn">🎵 点此开启背景音乐</button>
 
     <!-- 音频元素 -->
     <audio id="openingMusic" preload="auto">
@@ -1187,8 +1284,10 @@
         const treeContainer = document.querySelector('.tree-container');
         const hardControlOverlay = document.getElementById('hardControlOverlay');
         const giftDropContainer = document.getElementById('giftDropContainer');
-        const manualPlayBtn = document.getElementById('manual-play-btn');
         const loadingIndicator = document.getElementById('loadingIndicator');
+        const musicControls = document.getElementById('musicControls');
+        const musicBtn = document.getElementById('musicBtn');
+        const autoPlayHint = document.getElementById('autoPlayHint');
         
         // ============== 状态变量 ==============
         let isGiftOpened = false;
@@ -1196,11 +1295,12 @@
         let isMainAudioPlaying = false;
         let hardControlTimeout;
         let ornamentsData = [];
-        let bgmPlayAttempted = false;
         let loadedAssets = 0;
         let totalAssets = 0;
         let snowStarted = false;
         let snowflakes = [];
+        let autoPlayAttempted = false;
+        let autoPlaySucceeded = false;
         
         // 检测是否为移动端
         const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
@@ -1475,63 +1575,71 @@
             mainMusic.volume = 0.7;
             
             // 尝试静音播放以加载音频
-            const originalMuted = openingMusic.muted;
             openingMusic.muted = true;
+            mainMusic.muted = true;
             
-            const loadPromise = openingMusic.play();
+            const loadPromise = openingMusic.play().catch(e => {
+                console.log('开场音频预加载被阻止');
+            });
+            
             if (loadPromise !== undefined) {
                 loadPromise.then(() => {
                     openingMusic.pause();
                     openingMusic.currentTime = 0;
-                    openingMusic.muted = originalMuted;
                     console.log('开场音频预加载成功');
-                }).catch(e => {
-                    openingMusic.muted = originalMuted;
-                    console.log('开场音频预加载被阻止');
                 });
             }
             
-            // 同样预加载主界面音频
-            const originalMuted2 = mainMusic.muted;
-            mainMusic.muted = true;
+            const loadPromise2 = mainMusic.play().catch(e => {
+                console.log('主界面音频预加载被阻止');
+            });
             
-            const loadPromise2 = mainMusic.play();
             if (loadPromise2 !== undefined) {
                 loadPromise2.then(() => {
                     mainMusic.pause();
                     mainMusic.currentTime = 0;
-                    mainMusic.muted = originalMuted2;
                     console.log('主界面音频预加载成功');
-                }).catch(e => {
-                    mainMusic.muted = originalMuted2;
-                    console.log('主界面音频预加载被阻止');
                 });
             }
+            
+            // 恢复非静音状态
+            setTimeout(() => {
+                openingMusic.muted = false;
+                mainMusic.muted = false;
+            }, 500);
         }
         
         function playOpeningMusic() {
-            if (bgmPlayAttempted) return;
+            if (autoPlayAttempted) return;
             
-            bgmPlayAttempted = true;
+            autoPlayAttempted = true;
             openingMusic.currentTime = 0;
             openingMusic.muted = false;
+            
+            // 显示自动播放尝试提示
+            showAutoPlayHint('正在尝试播放背景音乐...');
             
             const playPromise = openingMusic.play();
             
             if (playPromise !== undefined) {
                 playPromise.then(() => {
-                    console.log('开场音乐播放成功');
+                    console.log('开场音乐自动播放成功');
                     isOpeningAudioPlaying = true;
-                    // 移动端不显示手动播放按钮
-                    if (!isMobile) {
-                        manualPlayBtn.style.display = 'none';
-                    }
+                    autoPlaySucceeded = true;
+                    updateMusicButtonState();
+                    showAutoPlayHint('背景音乐已自动播放');
                 }).catch(error => {
                     console.warn('开场音乐自动播放被阻止:', error);
-                    // 非移动端显示手动播放按钮
-                    if (!isMobile) {
-                        showManualPlayButton();
-                    }
+                    autoPlaySucceeded = false;
+                    
+                    // 显示提示，让用户手动播放
+                    setTimeout(() => {
+                        showAutoPlayHint('点击右上角音乐按钮播放背景音乐');
+                    }, 1000);
+                    
+                    // 确保音乐控制按钮可见
+                    musicControls.style.display = 'flex';
+                    updateMusicButtonState();
                 });
             }
         }
@@ -1552,60 +1660,89 @@
                 playPromise.then(() => {
                     console.log('主界面音乐播放成功');
                     isMainAudioPlaying = true;
-                    // 移动端不显示手动播放按钮
-                    if (!isMobile) {
-                        manualPlayBtn.style.display = 'none';
-                    }
+                    autoPlaySucceeded = true;
+                    updateMusicButtonState();
                 }).catch(error => {
                     console.warn('主界面音乐播放失败:', error);
-                    // 非移动端显示手动播放按钮
-                    if (!isMobile) {
-                        showManualPlayButton();
-                    }
+                    
+                    // 确保音乐控制按钮可见
+                    musicControls.style.display = 'flex';
+                    updateMusicButtonState();
                 });
             }
         }
         
-        function showManualPlayButton() {
-            if (isMobile) return; // 移动端不显示
-            manualPlayBtn.style.display = 'block';
-            manualPlayBtn.textContent = '🎵 点此开启背景音乐';
-            manualPlayBtn.classList.remove('error');
+        function showAutoPlayHint(message) {
+            autoPlayHint.textContent = message;
+            autoPlayHint.style.display = 'block';
+            
+            // 3秒后隐藏提示
+            setTimeout(() => {
+                autoPlayHint.style.display = 'none';
+            }, 3000);
         }
         
-        // 手动播放按钮事件 - 仅非移动端有效
-        if (!isMobile) {
-            manualPlayBtn.addEventListener('click', function() {
-                if (isOpeningAudioPlaying || isMainAudioPlaying) {
-                    if (isOpeningAudioPlaying) {
-                        openingMusic.muted = !openingMusic.muted;
-                        this.textContent = openingMusic.muted ? '🔇 取消静音' : '🔊 音乐播放中';
-                    } else if (isMainAudioPlaying) {
-                        mainMusic.muted = !mainMusic.muted;
-                        this.textContent = mainMusic.muted ? '🔇 取消静音' : '🔊 音乐播放中';
-                    }
+        function updateMusicButtonState() {
+            if (isOpeningAudioPlaying || isMainAudioPlaying) {
+                // 音乐正在播放
+                if (openingMusic.muted || mainMusic.muted) {
+                    musicBtn.textContent = '🔇';
+                    musicBtn.classList.add('muted');
+                    musicBtn.title = '点击取消静音';
                 } else {
-                    if (isGiftOpened) {
-                        mainMusic.play().then(() => {
-                            this.style.display = 'none';
-                        }).catch(e => {
-                            this.textContent = '🎵 播放失败，请检查浏览器设置';
-                            this.classList.add('error');
-                        });
-                    } else {
-                        openingMusic.play().then(() => {
-                            this.style.display = 'none';
-                        }).catch(e => {
-                            this.textContent = '🎵 播放失败，请检查浏览器设置';
-                            this.classList.add('error');
-                        });
-                    }
+                    musicBtn.textContent = '🎵';
+                    musicBtn.classList.remove('muted');
+                    musicBtn.title = '点击静音';
                 }
-            });
-        } else {
-            // 移动端：隐藏手动播放按钮
-            manualPlayBtn.style.display = 'none';
+                musicControls.style.display = 'flex';
+            } else {
+                // 音乐未播放
+                musicBtn.textContent = '🔈';
+                musicBtn.classList.remove('muted');
+                musicBtn.title = '点击播放背景音乐';
+                musicControls.style.display = 'flex';
+            }
         }
+        
+        // 音乐按钮点击事件
+        musicBtn.addEventListener('click', function() {
+            // 添加点击反馈动画
+            this.classList.add('touch-feedback');
+            setTimeout(() => {
+                this.classList.remove('touch-feedback');
+            }, 300);
+            
+            if (isOpeningAudioPlaying || isMainAudioPlaying) {
+                // 切换静音状态
+                if (isOpeningAudioPlaying) {
+                    openingMusic.muted = !openingMusic.muted;
+                } else if (isMainAudioPlaying) {
+                    mainMusic.muted = !mainMusic.muted;
+                }
+                updateMusicButtonState();
+            } else {
+                // 尝试播放音乐
+                if (isGiftOpened) {
+                    // 主界面音乐
+                    mainMusic.play().then(() => {
+                        isMainAudioPlaying = true;
+                        updateMusicButtonState();
+                    }).catch(e => {
+                        console.error('手动播放主界面音乐失败:', e);
+                        showAutoPlayHint('播放失败，请检查浏览器设置');
+                    });
+                } else {
+                    // 开场音乐
+                    openingMusic.play().then(() => {
+                        isOpeningAudioPlaying = true;
+                        updateMusicButtonState();
+                    }).catch(e => {
+                        console.error('手动播放开场音乐失败:', e);
+                        showAutoPlayHint('播放失败，请检查浏览器设置');
+                    });
+                }
+            }
+        });
         
         // ============== 雪花效果 - 增强版（带拖尾和旋转）==============
         
