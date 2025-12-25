@@ -216,7 +216,7 @@
             width: 100%;
             height: 100%;
             pointer-events: none;
-            z-index: 100; /* 提高层级，确保在最前面 */
+            z-index: 10000; /* 提高到最高层级 */
             overflow: hidden;
         }
         
@@ -224,14 +224,15 @@
             position: absolute;
             top: -60px;
             pointer-events: none;
-            will-change: transform, top;
+            will-change: transform, top, opacity;
             animation: snowFall linear infinite;
             -webkit-user-select: none;
             user-select: none;
-            background-size: contain;
-            background-repeat: no-repeat;
-            background-position: center;
-            background-image: none !important;
+            font-size: 24px; /* 添加字体大小 */
+            color: white; /* 添加白色 */
+            text-shadow: 0 0 8px rgba(255, 255, 255, 0.9); /* 添加发光效果 */
+            z-index: 10001; /* 确保雪花在顶层 */
+            filter: blur(0.5px); /* 轻微模糊效果 */
         }
         
         @keyframes snowFall {
@@ -243,8 +244,30 @@
                 opacity: 1;
             }
             100% {
-                transform: translateX(var(--snow-x, 0)) translateY(100vh) rotate(360deg);
+                transform: translateX(var(--snow-x, 0)) translateY(100vh) rotate(720deg);
                 opacity: 0;
+            }
+        }
+        
+        /* 雪花拖尾粒子 */
+        .snow-trail {
+            position: absolute;
+            pointer-events: none;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.6);
+            z-index: 10000;
+            animation: trailFade 1.5s ease-out forwards;
+            filter: blur(1px);
+        }
+        
+        @keyframes trailFade {
+            0% {
+                opacity: 0.7;
+                transform: scale(1);
+            }
+            100% {
+                opacity: 0;
+                transform: scale(0.2);
             }
         }
         
@@ -1031,7 +1054,7 @@
     <div id="main-screen">
         <!-- 祝福语区域 -->
         <div class="blessing-container">
-            <h2 class="blessing-title">🎅 圣诞祝福 🎅</h2>
+            <h2 class="blessing-title">🎄 MerryChristmas！🎄</h2>
             <div class="blessing-text" id="blessingText">
                 <!-- 打字机效果会在这里显示文字 -->
             </div>
@@ -1115,18 +1138,14 @@
         };
         
         // 祝福语数组
-        const blessings = [
-            "🎄 圣诞快乐！",
-            "🎁 愿你的圣诞节充满奇迹和欢乐！",
-            "✨ 愿圣诞的光芒照亮你的每一天！",
-            "🎅 愿圣诞老人带给你最美好的祝福！",
-            "❄️ 雪花飘落，祝福来到！",
-            "🌟 愿你的圣诞充满温馨与爱！",
-            "🦌 圣诞的钟声带来幸福与和平！",
-            "🔔 愿你在这个特别的季节里收获满满的快乐！",
-            "🕯️ 愿圣诞的烛光温暖你的心房！",
-            "🎉 祝你圣诞快乐，新年幸福！"
+         const blessings = [
+            "🎅 祝您在圣诞节每一天都充满着欢乐！",
+            "✨ Wishing you and your loved ones a season of harmony, joy, and good health！",
+            "🔔 愿圣诞的钟声能带来love＆peace！",
+            "🦌 愿您在这个特别的节日里，收获满满的快乐与安康！",
+            "🎉 最后祝华叔叔和明姨圣诞快乐，新年快乐！",
         ];
+
         
         // 彩带颜色
         const ribbonColors = ['#FF6B6B', '#4ECDC4', '#FFD166', '#06D6A0', '#118AB2', '#EF476F'];
@@ -1139,9 +1158,6 @@
         
         // 装饰品内容
         const ornamentContents = ['🎄', '🎁', '⭐', '🔔', '🕯️', '🍬', '❄️', '🎀'];
-        
-        // 雪花图片数组
-        const snowImages = ['snow1.png', 'snow2.png', 'snow3.png'];
         
         // ============== 获取元素 ==============
         const giftScreen = document.getElementById('gift-screen');
@@ -1170,12 +1186,13 @@
         let isGiftOpened = false;
         let isOpeningAudioPlaying = false;
         let isMainAudioPlaying = false;
-        let snowflakes = [];
         let hardControlTimeout;
         let ornamentsData = [];
         let bgmPlayAttempted = false;
         let loadedAssets = 0;
         let totalAssets = 0;
+        let snowStarted = false; // 雪花是否已开始
+        let snowflakes = []; // 存储雪花对象
         
         // 检测是否为移动端
         const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
@@ -1425,8 +1442,11 @@
             // 显示礼盒阶段的圣诞老人
             santaOpening.classList.add('visible');
             
-            // 修复：立即启动雪花效果
-            startSnow();
+            // 开始雪花效果
+            if (!snowStarted) {
+                startSnow();
+                snowStarted = true;
+            }
             
             console.log('页面初始化完成');
         }
@@ -1540,91 +1560,156 @@
             }
         });
         
-        // ============== 雪花效果 - 简化版 ==============
+        // ============== 雪花效果 - 增强版（带拖尾和旋转）==============
         
         function startSnow() {
             console.log('开始雪花效果');
             
             // 清空现有雪花容器
             snowContainer.innerHTML = '';
+            snowflakes = [];
             
-            const snowflakes = [];
+            // 创建雪花拖尾粒子
+            function createSnowTrail(x, y, size, opacity, color = 'rgba(255, 255, 255, 0.6)') {
+                const trail = document.createElement('div');
+                trail.className = 'snow-trail';
+                
+                // 随机大小
+                const trailSize = size * (0.3 + Math.random() * 0.4);
+                trail.style.width = trailSize + 'px';
+                trail.style.height = trailSize + 'px';
+                
+                // 随机位置偏移
+                const offsetX = (Math.random() - 0.5) * 10;
+                const offsetY = (Math.random() - 0.5) * 10;
+                
+                trail.style.left = (x + offsetX) + 'px';
+                trail.style.top = (y + offsetY) + 'px';
+                trail.style.backgroundColor = color;
+                trail.style.opacity = opacity * 0.7;
+                
+                // 随机动画时长
+                const animationDuration = 800 + Math.random() * 700;
+                trail.style.animationDuration = animationDuration + 'ms';
+                
+                // 添加拖尾粒子到容器
+                snowContainer.appendChild(trail);
+                
+                // 动画结束后移除拖尾粒子
+                setTimeout(() => {
+                    if (trail.parentNode) {
+                        trail.remove();
+                    }
+                }, animationDuration);
+            }
             
+            // 创建雪花
             function createSnowflake() {
                 const snowflake = document.createElement('div');
                 snowflake.className = 'snowflake';
                 
-                // 设置雪花大小
-                const size = isMobile ? 20 : 30;
-                snowflake.style.width = size + 'px';
-                snowflake.style.height = size + 'px';
+                // 使用Emoji雪花
+                snowflake.textContent = '❄️';
+                
+                // 随机大小
+                const size = isMobile ? 20 : 24 + Math.random() * 12;
+                snowflake.style.fontSize = size + 'px';
                 
                 // 随机水平位置
                 const leftPos = Math.random() * 100;
                 snowflake.style.left = leftPos + '%';
                 
-                // 使用本地雪花图片（直接使用img标签，不依赖背景图片）
-                const randomImg = snowImages[Math.floor(Math.random() * snowImages.length)];
+                // 随机透明度
+                const opacity = 0.7 + Math.random() * 0.3;
+                snowflake.style.opacity = opacity;
                 
-                // 创建图片元素来检查是否可用
-                const img = new Image();
-                img.onload = function() {
-                    // 图片加载成功，设置背景图片
-                    snowflake.style.backgroundImage = `url(${randomImg})`;
-                };
-                img.onerror = function() {
-                    // 图片加载失败，使用emoji
-                    snowflake.style.backgroundImage = 'none';
-                    snowflake.textContent = '❄️';
-                    snowflake.style.fontSize = (size * 0.8) + 'px';
-                    snowflake.style.textAlign = 'center';
-                    snowflake.style.lineHeight = size + 'px';
-                    snowflake.style.color = '#FFFFFF';
-                    snowflake.style.textShadow = '0 0 5px rgba(255, 255, 255, 0.8)';
-                };
-                
-                // 立即开始加载图片
-                img.src = randomImg;
-                
-                // 设置雪花透明度
-                snowflake.style.opacity = 0.7 + Math.random() * 0.3;
-                
-                // 设置水平漂移距离
-                const xDrift = Math.random() * 40 - 20; // -20px 到 20px
+                // 随机水平漂移距离
+                const xDrift = Math.random() * 60 - 30;
                 snowflake.style.setProperty('--snow-x', `${xDrift}px`);
                 
-                // 设置下落速度和延迟
-                const fallDuration = isMobile ? 15000 : 18000 + Math.random() * 12000;
+                // 随机下落速度和旋转
+                const fallDuration = isMobile ? 10000 : 8000 + Math.random() * 7000;
                 snowflake.style.animationDuration = `${fallDuration}ms`;
                 
+                // 随机延迟开始
                 const delay = Math.random() * 5;
                 snowflake.style.animationDelay = `${delay}s`;
                 
                 // 添加到容器
                 snowContainer.appendChild(snowflake);
-                snowflakes.push(snowflake);
+                
+                // 创建雪花数据对象
+                const snowflakeData = {
+                    element: snowflake,
+                    size: size,
+                    opacity: opacity,
+                    lastTrailTime: Date.now(),
+                    trailInterval: 150 + Math.random() * 100, // 随机拖尾间隔
+                    xDrift: xDrift,
+                    rotationSpeed: 0.5 + Math.random() * 1.5 // 随机旋转速度
+                };
+                
+                snowflakes.push(snowflakeData);
                 
                 // 雪花动画结束后重新创建
                 setTimeout(() => {
                     if (snowflake.parentNode) {
                         snowflake.remove();
                     }
-                    const index = snowflakes.indexOf(snowflake);
-                    if (index > -1) snowflakes.splice(index, 1);
+                    
+                    // 从数组中移除
+                    const index = snowflakes.indexOf(snowflakeData);
+                    if (index > -1) {
+                        snowflakes.splice(index, 1);
+                    }
                     
                     // 创建新的雪花
                     createSnowflake();
                 }, (fallDuration + delay * 1000));
+                
+                return snowflakeData;
+            }
+            
+            // 更新雪花位置和创建拖尾
+            function updateSnowflakes() {
+                const currentTime = Date.now();
+                
+                snowflakes.forEach(snowflake => {
+                    if (currentTime - snowflake.lastTrailTime > snowflake.trailInterval) {
+                        // 获取雪花当前位置
+                        const rect = snowflake.element.getBoundingClientRect();
+                        const x = rect.left + rect.width / 2;
+                        const y = rect.top + rect.height / 2;
+                        
+                        // 创建拖尾粒子
+                        createSnowTrail(x, y, snowflake.size, snowflake.opacity);
+                        
+                        // 偶尔创建彩色拖尾
+                        if (Math.random() > 0.8) {
+                            const colors = ['rgba(173, 216, 230, 0.5)', 'rgba(224, 255, 255, 0.5)', 'rgba(135, 206, 250, 0.5)'];
+                            const randomColor = colors[Math.floor(Math.random() * colors.length)];
+                            createSnowTrail(x, y, snowflake.size * 0.8, snowflake.opacity * 0.5, randomColor);
+                        }
+                        
+                        snowflake.lastTrailTime = currentTime;
+                    }
+                });
+                
+                // 继续更新
+                requestAnimationFrame(updateSnowflakes);
             }
             
             // 创建初始雪花
-            const snowflakeCount = isMobile ? 25 : 40;
+            const snowflakeCount = isMobile ? 30 : 50;
             
             for (let i = 0; i < snowflakeCount; i++) {
                 setTimeout(() => {
                     createSnowflake();
-                }, i * 200); // 错开创建时间
+                }, i * 150); // 错开创建时间
             }
+            
+            // 开始更新循环
+            updateSnowflakes();
         }
         
         // ============== 10秒硬控动画 ==============
@@ -2047,7 +2132,10 @@
             console.log('页面加载完成');
             
             // 立即开始雪花效果，不等待其他资源
-            startSnow();
+            if (!snowStarted) {
+                startSnow();
+                snowStarted = true;
+            }
             
             // 然后加载其他资源
             loadAllAssets();
